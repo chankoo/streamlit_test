@@ -324,3 +324,40 @@ st.write(
 )
 
 st.write(department_df)
+
+
+import plotly.express as px
+
+# 1. 부서 유형별(본사/현장) 부서 수
+dept_type_count = department_df["DEPT_TYPE"].value_counts().reset_index()
+dept_type_count.columns = ["DEPT_TYPE", "COUNT"]
+fig1 = px.bar(dept_type_count, x="DEPT_TYPE", y="COUNT", title="부서 유형별 부서 수")
+st.plotly_chart(fig1)
+
+# 2. DEP_LEVEL(조직 단계)별 부서 수
+level_count = department_df["DEP_LEVEL"].value_counts().sort_index().reset_index()
+level_count.columns = ["DEP_LEVEL", "COUNT"]
+fig2 = px.bar(
+    level_count, x="DEP_LEVEL", y="COUNT", title="DEP_LEVEL(조직 단계)별 부서 수"
+)
+st.plotly_chart(fig2)
+
+# 3. 상위 부서(UP_DEP_ID)별 하위 부서 수 (상위 10개만)
+up_dep_count = department_df["UP_DEP_ID"].value_counts().reset_index()
+up_dep_count.columns = ["UP_DEP_ID", "COUNT"]
+up_dep_count = up_dep_count[up_dep_count["UP_DEP_ID"] != ""].head(10)
+fig3 = px.bar(
+    up_dep_count, x="UP_DEP_ID", y="COUNT", title="상위 부서별 하위 부서 수 (Top 10)"
+)
+st.plotly_chart(fig3)
+
+# 4. 부서 설립 연도별 부서 수
+department_df["DEP_REL_START_YEAR"] = pd.to_datetime(
+    department_df["DEP_REL_START_DATE"]
+).dt.year
+year_count = (
+    department_df["DEP_REL_START_YEAR"].value_counts().sort_index().reset_index()
+)
+year_count.columns = ["YEAR", "COUNT"]
+fig4 = px.line(year_count, x="YEAR", y="COUNT", title="부서 설립 연도별 부서 수")
+st.plotly_chart(fig4)
